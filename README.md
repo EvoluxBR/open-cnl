@@ -30,7 +30,7 @@ cnl.buscar_numero('1131245100')
 
 ## Como funciona
 
-O código processa a base de dados em TXT para um banco de dados SQLite3 em memória RAM. O programa ocupa em média 35MB de RAM e apresenta resultados bastante rápidos.
+O código processa a base de dados em TXT para um banco de dados SQLite3 em memória RAM. O programa ocupa em média 35MB de RAM e apresenta resultados bastante rápidos, aproximadamente 39 consultas por segundo.
 
 ## Autor
 
