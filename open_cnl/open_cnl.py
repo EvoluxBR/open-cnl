@@ -9,35 +9,111 @@ class OpenCNL(object):
     Telecomunicações).
     """
 
-    def __init__(self, caminho_da_base, prefixo_de_referencia):
+    def __init__(self, caminho_da_base, prefixo_de_referencia,
+                 sufixo_de_referencia):
         """
-        Lê o arquivo da base e guarda na memória. Realiza uma pesquisa pelo
-        prefixo de referência e salva o número para futuras comparações, caso
-        ele tenha sido especificado.
+        Lê o arquivo da base de um banco SQLite3, previamente importado.
+        Realiza uma pesquisa pelo prefixo de referência e salva o número para
+        futuras comparações, caso ele tenha sido especificado.
         """
-        self.conn = sqlite3.connect(':memory:')
-        # self.conn = sqlite3.connect('banco.db')
-        c = self.conn.cursor()
-        c.execute("""
-            CREATE TABLE `open_cnl` (
-                sigla_uf TEXT,
-                sigla_cnl TEXT,
-                codigo_cnl TEXT,
-                nome_da_localidade TEXT,
-                nome_do_municipio TEXT,
-                codigo_da_area_de_tarifacao TEXT,
-                prefixo TEXT,
-                prestadora TEXT,
-                numero_da_faixa_inicial TEXT,
-                numero_da_faixa_final TEXT,
-                latitude TEXT,
-                hemisferio TEXT,
-                longitude TEXT,
-                sigla_cnl_da_area_local TEXT
-            );
-        """)
+        self.conn = sqlite3.connect(caminho_da_base)
+        self.localidade_de_referencia = self._buscar_localidade(
+            prefixo_de_referencia, sufixo_de_referencia)
 
-        arquivo_da_base = open(caminho_da_base, 'r')
+    def buscar_localidade(self, prefixo, sufixo, prefixo_de_referencia=None,
+                          sufixo_de_referencia=None):
+        """
+        Procura pelo prefixo de um número na base e retorna a tarifação, que
+        pode ser dos tipos: VC1, VC2 e VC3.
+        """
+        if not prefixo_de_referencia or not sufixo_de_referencia:
+            # Utilizar localidade de referência especificado na inicialização
+            # da classe.
+            localidade_de_referencia = self.localidade_de_referencia
+        else:
+            # Utilizar localidade de referência especificado na chamada do
+            # método.
+            localidade_de_referencia = self._buscar_localidade(
+                prefixo_de_referencia, sufixo_de_referencia)
+
+        if not localidade_de_referencia:
+            return None
+
+        # Buscar localidade para comparação.
+        localidade = self._buscar_localidade(prefixo, sufixo)
+        if not localidade:
+            return None
+
+        if localidade[5] == localidade_de_referencia[5]:
+            # Código Nacional de Localidade igual em ambas as localidades.
+            return 'VC1'
+        elif localidade[5][0] == localidade_de_referencia[5][0]:
+            # Código Nacional de Localidade diferente entre as localidades, mas
+            # o primeiro dígito é comum às duas.
+            return 'VC2'
+        else:
+            # Código Nacional de Localidade diferente entre as localidades.
+            return 'VC3'
+
+    def _buscar_localidade(self, prefixo, sufixo):
+        """Função de busca auxiliar para prefixo no banco de dados."""
+        c = self.conn.cursor()
+        localidade = c.execute("""
+            SELECT * FROM open_cnl
+            WHERE prefixo = ?
+            AND CAST(numero_da_faixa_inicial as INTEGER) <= ?
+            AND CAST(numero_da_faixa_final as INTEGER) >= ?;
+        """, (prefixo, int(sufixo), int(sufixo))).fetchone()
+        return localidade
+
+
+class OpenCNLImporter(object):
+    """
+    Biblioteca para ler e consultar banco de dados CNL (Código Nacional de
+    Localidade) seguindo especificações da ANATEL (Agência Nacional de
+    Telecomunicações).
+    """
+
+    def __init__(self, caminho_da_base, caminho_do_banco):
+        """
+        Armazena informações sobre o caminho da base e o caminho do banco.
+        """
+        self.caminho_da_base = caminho_da_base
+        self.caminho_do_banco = caminho_do_banco
+
+    def importar_base(self):
+        """
+        Lê o arquivo da base e guarda no banco de dados SQLite3.
+        """
+        self.conn = sqlite3.connect(self.caminho_do_banco)
+        c = self.conn.cursor()
+        try:
+            c.execute("""
+                CREATE TABLE `open_cnl` (
+                    sigla_uf TEXT,
+                    sigla_cnl TEXT,
+                    codigo_cnl TEXT,
+                    nome_da_localidade TEXT,
+                    nome_do_municipio TEXT,
+                    codigo_da_area_de_tarifacao TEXT,
+                    prefixo TEXT,
+                    prestadora TEXT,
+                    numero_da_faixa_inicial TEXT,
+                    numero_da_faixa_final TEXT,
+                    latitude TEXT,
+                    hemisferio TEXT,
+                    longitude TEXT,
+                    sigla_cnl_da_area_local TEXT
+                );
+            """)
+        except Exception, e:
+            print 'Ocorreu um erro ao importar a base.'
+            print 'Verifique se o banco já existe.'
+            print '-> %s' % e
+            self.conn.close()
+            return
+
+        arquivo_da_base = open(self.caminho_da_base, 'r')
         for linha in arquivo_da_base.readlines():
             linha_processada = self.processar_linha(linha.decode('latin-1'))
             c.execute("""
@@ -47,9 +123,8 @@ class OpenCNL(object):
             """, linha_processada)
 
         arquivo_da_base.close()
-        self.prefixo_de_referencia = c.execute(
-            """SELECT * FROM open_cnl WHERE prefixo = ?;""",
-            (prefixo_de_referencia,)).fetchone()
+        self.conn.commit()
+        self.conn.close()
 
     def processar_linha_completa(self, linha):
         """
@@ -111,39 +186,7 @@ class OpenCNL(object):
         MM = Minuto,
         SS = Segundo e
         CC = Centésimos de segundo.
-        Estamos ignorando centésimos de segundo e retornando GG.MMSS (float).
+        Estamos ignorando centésimos de segundo e retornando GGMMSS.
         """
-        return '%s.%s' % (coordenada[:2], coordenada[2:6])
-
-    def buscar_prefixo(self, prefixo, prefixo_de_referencia=None):
-        """
-        Procura pelo prefixo de um número na base e retorna a tarifação, que
-        pode ser dos tipos: VC1, VC2 e VC3.
-        """
-        c = self.conn.cursor()
-
-        if not prefixo_de_referencia:
-            # Utilizar prefixo de referência especificado na inicialização
-            # da classe.
-            prefixo_de_referencia = self.prefixo_de_referencia
-        else:
-            # Utilizar prefixo de referência especificado na chamada do método.
-            prefixo_de_referencia = c.execute(
-                """SELECT * FROM open_cnl WHERE prefixo = ?;""",
-                (prefixo_de_referencia,)).fetchone()
-
-        # Buscar prefixo para comparação.
-        prefixo = c.execute(
-            """SELECT * FROM open_cnl WHERE prefixo = ?;""",
-            (prefixo,)).fetchone()
-
-        if prefixo[5] == prefixo_de_referencia[5]:
-            # Código Nacional de Localidade igual em ambos os prefixos.
-            return 'VC1'
-        elif prefixo[5][0] == prefixo_de_referencia[5][0]:
-            # Código Nacional de Localidade diferente entre os prefixos, mas
-            # o primeiro dígito é comum aos dois.
-            return 'VC2'
-        else:
-            # Código Nacional de Localidade diferente entre os prefixos.
-            return 'VC3'
+        # FIXME: Transformar em graus com os dados recebidos.
+        return coordenada[:6]

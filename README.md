@@ -13,24 +13,34 @@ Biblioteca para ler e consultar o banco de dados CNL (Código Nacional de Locali
 from open_cnl.open_cnl import OpenCNL
 
 # Natal/RN - Centro de custo
-cnl = OpenCNL('~/CE_F_130250.TXT', '8432118243')
+cnl = OpenCNL('~/cnl_anatel.sqlite3', '843211', '8243')
 
 # Parnamirim/RN - Área conurbada
 # >>> 'VC1'
-cnl.buscar_numero('8436448100')
+cnl.buscar_numero('843644', '8100')
 
 # Mossoró/RN - Mesmo estado
 # >>> 'VC2'
-cnl.buscar_numero('8433154935')
+cnl.buscar_numero('843315', '4935')
 
 # Parnamirim/RN - Área conurbada
 # >>> 'VC3'
-cnl.buscar_numero('1131245100')
+cnl.buscar_numero('113124', '5100')
 ```
 
 ## Como funciona
 
-O código processa a base de dados em TXT para um banco de dados SQLite3 em memória RAM. O programa ocupa em média 35MB de RAM e apresenta resultados bastante rápidos, aproximadamente 39 consultas por segundo.
+O código processa a base de dados em TXT para um banco de dados SQLite3.
+
+
+## Importando a base atualizada da ANATEL
+
+```python
+from open_cnl.open_cnl import OpenCNLImporter
+
+cnl_importer = OpenCNLImporter('~/CE_F_130250.TXT', '~/cnl_anatel.sqlite3')
+cnl_importer.importar_base()
+```
 
 ## Autor
 
