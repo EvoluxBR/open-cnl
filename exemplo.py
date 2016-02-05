@@ -4,7 +4,7 @@ from open_cnl.open_cnl import OpenCNL
 
 
 # Natal/RN - Centro de custo
-cnl = OpenCNL('banco.sqlite3', '843211', '8243')
+cnl = OpenCNL('dist/banco.sqlite3', '843211', '8243')
 
 # Parnamirim/RN - Área conurbada
 # >>> 'VC1'
