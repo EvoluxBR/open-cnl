@@ -126,7 +126,7 @@ class OpenCNLImporter(object):
         self.conn.commit()
         self.conn.close()
 
-    def processar_linha_completa(self, linha):
+    def processar_linha(self, linha):
         """
         Processa uma linha completa (com coordenadas) em uma tupla de acordo com
         as especificações.
@@ -142,42 +142,24 @@ class OpenCNLImporter(object):
             linha[123:153].strip(), # prestadora
             linha[153:157].strip(), # numero_da_faixa_inicial
             linha[157:161].strip(), # numero_da_faixa_final
-            self.processar_coordenada(linha[161:169].strip()), # latitude
-            linha[169:174].strip(), # hemisferio
-            self.processar_coordenada(linha[174:182].strip()), # longitude
-            linha[182:186].strip() # sigla_cnl_da_area_local
         )
-        return linha_processada
 
-    def processar_linha_incompleta(self, linha):
-        """
-        Processa uma linha incompleta (sem coordenadas) em uma tupla de acordo
-        com as especificações.
-        """
-        linha_processada = (
-            linha[:2].strip(), # sigla_uf
-            linha[2:6].strip(), # sigla_cnl
-            linha[6:11].strip(), # codigo_cnl
-            linha[11:61].strip().replace('  ', ''), # nome_da_localidade
-            linha[61:111].strip(), # nome_do_municipio
-            linha[111:116].strip(), # codigo_da_area_de_tarifacao
-            linha[116:123].strip(), # prefixo
-            linha[123:153].strip(), # prestadora
-            linha[153:157].strip(), # numero_da_faixa_inicial
-            linha[157:161].strip(), # numero_da_faixa_final
-            '', '', '', # latitude, hemisferio, longitude
-            linha[161:164].strip() # sigla_cnl_da_area_local
-        )
-        return linha_processada
-
-    def processar_linha(self, linha):
-        """
-        Verifica o tamanho da linha e encaminha para o método adequado.
-        """
         if len(linha) > 167:
-            return self.processar_linha_completa(linha)
+            # Linha completa com corrdenadas
+            linha_processada = linha_processada + (
+                self.processar_coordenada(linha[161:169].strip()), # latitude
+                linha[169:174].strip(), # hemisferio
+                self.processar_coordenada(linha[174:182].strip()), # longitude
+                linha[182:186].strip() # sigla_cnl_da_area_local
+            )
         else:
-            return self.processar_linha_incompleta(linha)
+            # Linha incompleta sem coordenadas
+            linha_processada = linha_processada + (
+                '', '', '', # latitude, hemisferio, longitude
+                linha[161:164].strip() # sigla_cnl_da_area_local
+            )
+
+        return linha_processada
 
     def processar_coordenada(self, coordenada):
         """
