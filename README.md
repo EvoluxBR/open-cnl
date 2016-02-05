@@ -1,6 +1,7 @@
 # OpenCNL
 
 [![Build Status](https://travis-ci.org/EvoluxBR/open-cnl.svg?branch=master)](https://travis-ci.org/EvoluxBR/open-cnl)
+[![PyPI version](https://badge.fury.io/py/open-cnl.svg)](https://badge.fury.io/py/open-cnl)
 
 Biblioteca para ler e consultar o banco de dados CNL (Código Nacional de Localidade) seguindo especificações da ANATEL (Agência Nacional de Telecomunicações).
 
