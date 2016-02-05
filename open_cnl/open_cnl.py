@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import sqlite3
+import io
 
 
 class OpenCNL(object):
@@ -112,9 +113,9 @@ class OpenCNLImporter(object):
             self.conn.close()
             return
 
-        arquivo_da_base = open(self.caminho_da_base, 'r')
+        arquivo_da_base = io.open(self.caminho_da_base, 'r', encoding='latin-1')
         for linha in arquivo_da_base.readlines():
-            linha_processada = self.processar_linha(linha.decode('latin-1'))
+            linha_processada = self.processar_linha(linha)
             c.execute("""
                 INSERT INTO open_cnl VALUES (
                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
