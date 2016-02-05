@@ -11,7 +11,17 @@ Biblioteca para ler e consultar o banco de dados CNL (Código Nacional de Locali
 pip install open-cnl
 ```
 
+## Gerando banco de dados apartir de TXT 
+
+```shell
+make dist
+```
+
 ## Exemplo
+
+```shell
+python exemplo.py
+```
 
 - Prefeitura Municipal de Natal/RN - (84) 3211-8243
 - Prefeitura Municipal de Parnamirim/RN - (84) 3644-8100
