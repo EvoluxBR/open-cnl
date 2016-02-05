@@ -17,15 +17,15 @@ cnl = OpenCNL('~/cnl_anatel.sqlite3', '843211', '8243')
 
 # Parnamirim/RN - Área conurbada
 # >>> 'VC1'
-cnl.buscar_numero('843644', '8100')
+cnl.buscar_localidade('843644', '8100')
 
 # Mossoró/RN - Mesmo estado
 # >>> 'VC2'
-cnl.buscar_numero('843315', '4935')
+cnl.buscar_localidade('843315', '4935')
 
 # Parnamirim/RN - Área conurbada
 # >>> 'VC3'
-cnl.buscar_numero('113124', '5100')
+cnl.buscar_localidade('113124', '5100')
 ```
 
 ## Como funciona
