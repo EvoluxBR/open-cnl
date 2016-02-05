@@ -1,0 +1,9 @@
+language: python 
+python:
+        - "2.7"
+        - "3.5"
+before_script: "make prepare-tests"
+script: "python tests.py"
+branches:
+        only:
+                - master 

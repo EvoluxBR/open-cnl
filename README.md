@@ -1,5 +1,7 @@
 # OpenCNL
 
+[![Build Status](https://travis-ci.org/EvoluxBR/open-cnl.svg?branch=master)](https://travis-ci.org/EvoluxBR/open-cnl)
+
 Biblioteca para ler e consultar o banco de dados CNL (Código Nacional de Localidade) seguindo especificações da ANATEL (Agência Nacional de Telecomunicações).
 
 ## Instalação
@@ -51,3 +53,7 @@ cnl_importer.importar_base()
 ## Autor
 
 Victor Torres <vpaivatorres@gmail.com>
+
+## Contribuidores
+
+Stefan Yohansson <sy.fen0@gmail.com>
