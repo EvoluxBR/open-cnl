@@ -4,7 +4,7 @@ import unittest
 from datetime import datetime
 from open_cnl.open_cnl import OpenCNL, OpenCNLImporter
 
-caminho_da_base_original = 'CE_F_130250.TXT'
+caminho_da_base_original = 'base.txt'
 caminho_da_base = 'banco.sqlite3'
 
 # Prefeitura Municipal de Natal/RN
