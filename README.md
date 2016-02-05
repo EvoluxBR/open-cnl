@@ -2,6 +2,12 @@
 
 Biblioteca para ler e consultar o banco de dados CNL (Código Nacional de Localidade) seguindo especificações da ANATEL (Agência Nacional de Telecomunicações).
 
+## Instalação
+
+```shell
+pip install open-cnl
+```
+
 ## Exemplo
 
 - Prefeitura Municipal de Natal/RN - (84) 3211-8243
