@@ -106,10 +106,9 @@ class OpenCNLImporter(object):
                     sigla_cnl_da_area_local TEXT
                 );
             """)
-        except Exception, e:
-            print 'Ocorreu um erro ao importar a base.'
-            print 'Verifique se o banco já existe.'
-            print '-> %s' % e
+        except Exception:
+            print('Ocorreu um erro ao importar a base.')
+            print('Verifique se o banco já existe.')
             self.conn.close()
             return
 

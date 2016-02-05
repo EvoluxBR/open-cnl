@@ -23,15 +23,15 @@ class TestOpenCNL(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        print 'Carregando base...'
+        print('Carregando base...')
         inicio = datetime.now()
 
         # Removendo base caso ela já exista (SQLite3, não a original em TXT)
         try:
             os.remove(caminho_da_base)
         except OSError:
-            print 'Não foi possível remover o banco de dados.'
-            print 'Provavelmente ele não existe.'
+            print('Não foi possível remover o banco de dados.')
+            print('Provavelmente ele não existe.')
 
         # Importando a base (só precisa ser feito uma vez)
         cnl_importer = OpenCNLImporter(
@@ -41,7 +41,7 @@ class TestOpenCNL(unittest.TestCase):
         # Iniciando Open CNL
         cls.cnl = OpenCNL(caminho_da_base, prefixo_natal, sufixo_natal)
         fim = datetime.now()
-        print 'Base carregada em %s' % (fim - inicio)
+        print('Base carregada em %s' % (fim - inicio))
 
     def test_vc1(self):
         # Natal/RN -> Parnamirim/RN - Área conurbada - VC1
