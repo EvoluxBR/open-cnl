@@ -1,9 +1,8 @@
-language: python 
+language: python
 python:
         - "2.7"
         - "3.5"
-before_script: "make prepare-tests"
-script: "python tests.py"
+script: "make test"
 branches:
         only:
-                - master 
+                - master
