@@ -74,11 +74,14 @@ class OpenCNL(object):
 
         return localidade
 
+
 class LocalidadeNaoEncontrada(Exception):
     pass
 
+
 class ErroAoLerDoBancoDeDados(Exception):
     pass
+
 
 class ErroAoConectarComBancoDeDados(Exception):
     pass

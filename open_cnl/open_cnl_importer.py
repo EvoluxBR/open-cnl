@@ -96,12 +96,31 @@ class OpenCNLImporter(object):
         """
         Lê o arquivo da base e guarda no banco de dados SQLite3.
         """
-        self.criar_banco_de_dados()
-        arquivo_zip = self.baixar_base_atualizada()
-        arquivo_txt = self.extrair_base_do_arquivo_zip(arquivo_zip)
+        try:
+            self.criar_banco_de_dados()
+        except Exception:
+            raise ErroAoCriarBancoDeDados
+
+        try:
+            arquivo_zip = self.baixar_base_atualizada()
+        except Exception:
+            raise ErroAoBaixarBaseDaANATEL
+
+        try:
+            arquivo_txt = self.extrair_base_do_arquivo_zip(arquivo_zip)
+        except Exception:
+            raise ErroAoExtrairBaseDaANATEL
+
         for linha in arquivo_txt.readlines():
-            linha_processada = self.processar_linha(linha)
-            self.gravar_linha_no_banco(linha_processada)
+            try:
+                linha_processada = self.processar_linha(linha)
+            except Exception:
+                raise ErroAoProcessarBaseDaANATEL
+
+            try:
+                self.gravar_linha_no_banco(linha_processada)
+            except Exception:
+                raise ErroAoInserirDadosNoBanco
 
         self.fecha_conexao_com_o_banco()
 
@@ -153,6 +172,47 @@ class OpenCNLImporter(object):
         # FIXME: Transformar em graus com os dados recebidos.
         return coordenada[:6]
 
+
+class ErroAoCriarBancoDeDados(Exception):
+    pass
+
+
+class ErroAoBaixarBaseDaANATEL(Exception):
+    pass
+
+
+class ErroAoExtrairBaseDaANATEL(Exception):
+    pass
+
+
+class ErroAoProcessarBaseDaANATEL(Exception):
+    pass
+
+
+class ErroAoInserirDadosNoBanco(Exception):
+    pass
+
+
 if __name__ == "__main__":
-    open_cnl_importer = OpenCNLImporter(sys.argv[1])
-    open_cnl_importer.importar_base()
+    if not len(sys.argv) == 2:
+        print('Utilização: open_cnl_importer <destino.sqlite3>')
+        return
+
+    arquivo_de_destino = sys.argv[1]
+    if os.path.exists(arquivo_de_destino):
+        print('Arquivo de destino já existe: %s' % arquivo_de_destino)
+        return
+
+    open_cnl_importer = OpenCNLImporter(arquivo_de_destino)
+    try:
+        open_cnl_importer.importar_base()
+    except ErroAoCriarBancoDeDados:
+        print('Erro ao criar o banco de dados')
+    except ErroAoBaixarBaseDaANATEL:
+        print('Erro ao baixar a base da ANATEL')
+    except ErroAoExtrairBaseDaANATEL:
+        print('Erro ao extrair a base da ANATEL')
+    except ErroAoProcessarBaseDaANATEL:
+        print('Erro ao processar a base da ANATEL')
+    except ErroAoInserirDadosNoBanco:
+        print('Erro ao inserir dados no banco')
