@@ -38,13 +38,8 @@ class OpenCNL(object):
             localidade_de_referencia = self._buscar_localidade(
                 prefixo_de_referencia, sufixo_de_referencia)
 
-        if not localidade_de_referencia:
-            return None
-
         # Buscar localidade para comparação.
         localidade = self._buscar_localidade(prefixo, sufixo)
-        if not localidade:
-            return None
 
         if localidade[5] == localidade_de_referencia[5]:
             # Código Nacional de Localidade igual em ambas as localidades.
@@ -66,4 +61,11 @@ class OpenCNL(object):
             AND CAST(numero_da_faixa_inicial as INTEGER) <= ?
             AND CAST(numero_da_faixa_final as INTEGER) >= ?;
         """, (prefixo, int(sufixo), int(sufixo))).fetchone()
+
+        if not localidade:
+            raise LocalidadeNaoEncontrada
+
         return localidade
+
+class LocalidadeNaoEncontrada(Exception):
+    pass

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import unittest
-from open_cnl.open_cnl import OpenCNL
+from open_cnl.open_cnl import OpenCNL, LocalidadeNaoEncontrada
 
 caminho_da_base = './cnl_anatel.sqlite3'
 
@@ -44,6 +44,11 @@ class TestOpenCNL(unittest.TestCase):
             prefixo_parnamirim, sufixo_parnamirim,
             prefixo_mossoro, sufixo_mossoro)
         self.assertEqual(tarifa, 'VC2')
+
+    def test_localidade_nao_encontrada(self):
+        with self.assertRaises(LocalidadeNaoEncontrada):
+            tarifa = self.cnl.buscar_localidade('9977777', '545454')
+
 
 if __name__ == '__main__':
     unittest.main()
