@@ -3,3 +3,4 @@ setup.cfg
 setup.py
 open_cnl/__init__.py
 open_cnl/open_cnl.py
+open_cnl/open_cnl_importer.py
