@@ -16,7 +16,11 @@ class OpenCNL(object):
         Realiza uma pesquisa pelo prefixo de referência e salva o número para
         futuras comparações (centro de custo), caso ele tenha sido especificado.
         """
-        self.conn = sqlite3.connect(caminho_da_base)
+        try:
+            self.conn = sqlite3.connect(caminho_da_base)
+        except Exception:
+            raise ErroAoConectarComBancoDeDados
+
         self.localidade_de_referencia = self._buscar_localidade(
             prefixo_de_referencia, sufixo_de_referencia)
 
@@ -54,13 +58,16 @@ class OpenCNL(object):
 
     def _buscar_localidade(self, prefixo, sufixo):
         """Função de busca auxiliar para prefixo no banco de dados."""
-        c = self.conn.cursor()
-        localidade = c.execute("""
-            SELECT * FROM open_cnl
-            WHERE prefixo = ?
-            AND CAST(numero_da_faixa_inicial as INTEGER) <= ?
-            AND CAST(numero_da_faixa_final as INTEGER) >= ?;
-        """, (prefixo, int(sufixo), int(sufixo))).fetchone()
+        try:
+            c = self.conn.cursor()
+            localidade = c.execute("""
+                SELECT * FROM open_cnl
+                WHERE prefixo = ?
+                AND CAST(numero_da_faixa_inicial as INTEGER) <= ?
+                AND CAST(numero_da_faixa_final as INTEGER) >= ?;
+            """, (prefixo, int(sufixo), int(sufixo))).fetchone()
+        except Exception:
+            raise ErroAoLerDoBancoDeDados
 
         if not localidade:
             raise LocalidadeNaoEncontrada
@@ -68,4 +75,10 @@ class OpenCNL(object):
         return localidade
 
 class LocalidadeNaoEncontrada(Exception):
+    pass
+
+class ErroAoLerDoBancoDeDados(Exception):
+    pass
+
+class ErroAoConectarComBancoDeDados(Exception):
     pass

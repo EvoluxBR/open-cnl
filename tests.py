@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import unittest
-from open_cnl.open_cnl import OpenCNL, LocalidadeNaoEncontrada
+from open_cnl.open_cnl import (OpenCNL, LocalidadeNaoEncontrada,
+                               ErroAoLerDoBancoDeDados)
 
 caminho_da_base = './cnl_anatel.sqlite3'
 
@@ -48,6 +49,10 @@ class TestOpenCNL(unittest.TestCase):
     def test_localidade_nao_encontrada(self):
         with self.assertRaises(LocalidadeNaoEncontrada):
             tarifa = self.cnl.buscar_localidade('9977777', '545454')
+
+    def test_erro_ao_ler_do_banco_de_dados(self):
+        with self.assertRaises(ErroAoLerDoBancoDeDados):
+            OpenCNL('nao_existe.sqlite3', prefixo_natal, sufixo_natal)
 
 
 if __name__ == '__main__':
