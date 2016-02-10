@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import io
+import os
 import sqlite3
 import sys
 import urllib2
@@ -71,6 +72,12 @@ class OpenCNLImporter(object):
                 hemisferio TEXT,
                 longitude TEXT,
                 sigla_cnl_da_area_local TEXT
+            );
+        """)
+
+        c.execute("""
+            CREATE INDEX `ix_localidade` ON `open_cnl` (
+                prefixo, numero_da_faixa_inicial, numero_da_faixa_inicial
             );
         """)
 
@@ -193,12 +200,12 @@ class ErroAoInserirDadosNoBanco(Exception):
     pass
 
 
-if __name__ == "__main__":
-    if not len(sys.argv) == 2:
+def main(argv):
+    if not len(argv) == 2:
         print('Utilização: open_cnl_importer <destino.sqlite3>')
         return
 
-    arquivo_de_destino = sys.argv[1]
+    arquivo_de_destino = argv[1]
     if os.path.exists(arquivo_de_destino):
         print('Arquivo de destino já existe: %s' % arquivo_de_destino)
         return
@@ -216,3 +223,6 @@ if __name__ == "__main__":
         print('Erro ao processar a base da ANATEL')
     except ErroAoInserirDadosNoBanco:
         print('Erro ao inserir dados no banco')
+
+if __name__ == "__main__":
+    main(sys.argv)
