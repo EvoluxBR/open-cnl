@@ -174,10 +174,9 @@ class OpenCNLImporter(object):
         MM = Minuto,
         SS = Segundo e
         CC = Centésimos de segundo.
-        Estamos ignorando centésimos de segundo e retornando GGMMSS.
         """
-        # FIXME: Transformar em graus com os dados recebidos.
-        return coordenada[:6]
+        # TODO: Transformar em um formato mais portável.
+        return coordenada[:8]
 
 
 class ErroAoCriarBancoDeDados(Exception):
