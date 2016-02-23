@@ -92,7 +92,7 @@ class OpenCNLImporter(object):
             );
         """, linha_processada)
 
-    def fecha_conexao_com_o_banco(self):
+    def fechar_conexao_com_o_banco(self):
         """
         Grava alterações e fecha o banco de dados SQLite3.
         """
@@ -129,7 +129,7 @@ class OpenCNLImporter(object):
             except Exception:
                 raise ErroAoInserirDadosNoBanco
 
-        self.fecha_conexao_com_o_banco()
+        self.fechar_conexao_com_o_banco()
 
     def processar_linha(self, linha):
         """
