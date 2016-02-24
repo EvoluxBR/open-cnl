@@ -44,7 +44,7 @@ from open_cnl.open_cnl import OpenCNL
 cnl = OpenCNL('./cnl_anatel.sqlite3')
 
 # Pesquisando por um número de Natal/RN
-cnl.pesquisar_localidade('843211', '8243')
+localidade = cnl.pesquisar_localidade('843211', '8243')
 ```
 
 Os dados retornados estarão num dicionário no seguinte formato:
