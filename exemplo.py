@@ -2,34 +2,28 @@
 from datetime import datetime
 from open_cnl.open_cnl import OpenCNL
 
+# Inicializamos a classe que se
+# conecta ao banco de dados
+cnl = OpenCNL('./cnl_anatel.sqlite3')
 
-# Natal/RN - Centro de custo
-cnl = OpenCNL('dist/banco.sqlite3', '843211', '8243')
-
+# Pesquisando por um número de Natal/RN
+print(cnl.pesquisar_localidade('843211', '8243'))
 # Parnamirim/RN - Área conurbada
-# >>> 'VC1'
-print cnl.buscar_localidade('843644', '8100')
-
+print(cnl.pesquisar_localidade('843644', '8100'))
 # Mossoró/RN - Mesmo estado
-# >>> 'VC2'
-print cnl.buscar_localidade('843315', '4768')
-
+print(cnl.pesquisar_localidade('843315', '4768'))
 # São Paulo/SP - Outro estado
-# >>> 'VC3'
-print cnl.buscar_localidade('113124', '5100')
+print(cnl.pesquisar_localidade('113124', '5100'))
 
 def teste(cnl):
     # Parnamirim/RN - Área conurbada
-    # >>> 'VC1'
-    cnl.buscar_localidade('843644', '8100')
+    cnl.pesquisar_localidade('843644', '8100')
 
     # Mossoró/RN - Mesmo estado
-    # >>> 'VC2'
-    cnl.buscar_localidade('843315', '4768')
+    cnl.pesquisar_localidade('843315', '4768')
 
     # São Paulo/SP - Outro estado
-    # >>> 'VC3'
-    cnl.buscar_localidade('113124', '5100')
+    cnl.pesquisar_localidade('113124', '5100')
 
 inicio = datetime.now()
 quantidade = 100

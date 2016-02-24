@@ -33,47 +33,54 @@ open_cnl_importer.importar_base()
 
 ## Exemplo prático
 
-Vamos utilizar como exemplo os telefones das prefeituras municipais das
-seguintes cidades:
-
-- Natal/RN - (84) 3211-8243
-- Parnamirim/RN - (84) 3644-8100
-- Mossoró/RN - (84) 3315-4935
-- São Paulo/SP - (11) 3124-5100
-
-Nosso centro de custo será Natal/RN, que está na mesma região metropolitana de
-Parnamirim/RN. Mossoró/RN, por sua vez, se localiza no interior do estado. Por
-último, São Paulo, que fica em outro estado. Veja o código do arquivo
-`exemplo.py`.
+Vamos utilizar como exemplo o telefone da prefeitura municipal de Natal/RN:
+(84) 3211-8243. Veja este código no arquivo `exemplo.py`.
 
 ```python
 from open_cnl.open_cnl import OpenCNL
 
-# Inicializamos a classe especificando
-# nosso centro de custo: Natal/RN
-cnl = OpenCNL('./cnl_anatel.sqlite3', '843211', '8243')
+# Inicializamos a classe que se
+# conecta ao banco de dados
+cnl = OpenCNL('./cnl_anatel.sqlite3')
 
-# Ligando de Natal/RN para
-# Parnamirim/RN - Área conurbada
-# >>> 'VC1'
-cnl.buscar_localidade('843644', '8100')
+# Pesquisando por um número de Natal/RN
+cnl.pesquisar_localidade('843211', '8243')
+```
 
-# Agora ligando de Natal/RN para
-# Mossoró/RN - Mesmo estado
-# >>> 'VC2'
-cnl.buscar_localidade('843315', '4935')
+Os dados retornados estarão num dicionário no seguinte formato:
 
-# Ligando de Natal/RN para
-# São Paulo/SP - Outro estado
-# >>> 'VC3'
-cnl.buscar_localidade('113124', '5100')
+```python
+{
+    'prestadora': u'TELEMAR NORTE LESTE S.A.',
+    'nome_da_localidade': u'NATAL',
+    'hemisferio': u'S',
+    'numero_da_faixa_final': u'8999',
+    'sigla_cnl_da_area_local': u'NTL',
+    'numero_da_faixa_inicial': u'8000',
+    'longitude': u'351232',
+    'prefixo': u'843211',
+    'codigo_da_area_de_tarifacao': u'842',
+    'latitude': u'547419',
+    'codigo_cnl': u'84000',
+    'sigla_uf': u'RN',
+    'nome_do_municipio': u'NATAL',
+    'sigla_cnl': u'NTL'
+}
+```
 
-# Escolhendo outro centro de custo
-# sem reiniciar a classe (apenas essa consulta)
-# Ligando de Mossoró/RN para
-# Parnamirim/RN - Mesmo estado
-# >>> 'VC2'
-cnl.buscar_localidade('843644', '8100', '843315', '4935')
+Caso uma localidade não seja encontrada será retornado o valor `None`.
+
+### JSON
+
+Na inicialização da classe podemos definir o parâmetro `as_json` como `True`.
+O padrão desse argumento é `False` e quando verdadeiro, permite que os dados
+sejam retornados em uma string no formato JSON.
+
+```python
+from open_cnl.open_cnl import OpenCNL
+
+cnl = OpenCNL('./cnl_anatel.sqlite3')
+cnl.pesquisar_localidade('843211', '8243', as_json=True)
 ```
 
 ## Autor

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import io
+import json
 import sqlite3
 
 
@@ -9,62 +10,78 @@ class OpenCNL(object):
     dados da ANATEL gerado pelo OpenCNLImporter.
     """
 
-    def __init__(self, caminho_da_base, prefixo_de_referencia,
-                 sufixo_de_referencia):
+    def __init__(self, caminho_da_base):
         """
         Lê o arquivo da base de um banco SQLite3, previamente importado.
-        Realiza uma pesquisa pelo prefixo de referência e salva o número para
-        futuras comparações (centro de custo), caso ele tenha sido especificado.
         """
         try:
             self.conn = sqlite3.connect(caminho_da_base)
         except Exception:
             raise ErroAoConectarComBancoDeDados
 
-        self.localidade_de_referencia = self._buscar_localidade(
-            prefixo_de_referencia, sufixo_de_referencia)
-
-    def buscar_localidade(self, prefixo, sufixo, prefixo_de_referencia=None,
-                          sufixo_de_referencia=None):
+    def pesquisar_localidade(self, prefixo, sufixo, as_json=False):
         """
-        Procura pelo prefixo de um número na base e retorna a tarifação, que
-        pode ser dos tipos: VC1, VC2 e VC3. Por padrão utiliza o centro de custo
-        definido na inicialização da classe, caso novos prefixo e sufixo não
-        tenham sido definidos.
+        Procura pelo por um número cujo prefixo e o sufixo (com DDD) esteja na
+        base e retorna os resultados encontrados.
         """
-        if not prefixo_de_referencia or not sufixo_de_referencia:
-            # Utilizar localidade de referência especificado na inicialização
-            # da classe.
-            localidade_de_referencia = self.localidade_de_referencia
-        else:
-            # Utilizar localidade de referência especificado na chamada do
-            # método.
-            localidade_de_referencia = self._buscar_localidade(
-                prefixo_de_referencia, sufixo_de_referencia)
 
-        # Buscar localidade para comparação.
-        localidade = self._buscar_localidade(prefixo, sufixo)
+        # Pesquisa a localidade no banco de dados.
+        try:
+            localidade = self._pesquisar_localidade(prefixo, sufixo)
+        except LocalidadeNaoEncontrada:
+            if as_json:
+                # Se a opção estiver ativa, retornar como JSON
+                return json.dumps(None)
 
-        if localidade[5] == localidade_de_referencia[5]:
-            # Código Nacional de Localidade igual em ambas as localidades.
-            return 'VC1'
-        elif localidade[5][0] == localidade_de_referencia[5][0]:
-            # Código Nacional de Localidade diferente entre as localidades, mas
-            # o primeiro dígito é comum às duas.
-            return 'VC2'
-        else:
-            # Código Nacional de Localidade diferente entre as localidades.
-            return 'VC3'
+            return None
 
-    def _buscar_localidade(self, prefixo, sufixo):
-        """Função de busca auxiliar para prefixo no banco de dados."""
+        localidade = dict(
+            sigla_uf=localidade[0],
+            sigla_cnl=localidade[1],
+            codigo_cnl=localidade[2],
+            nome_da_localidade=localidade[3],
+            nome_do_municipio=localidade[4],
+            codigo_da_area_de_tarifacao=localidade[5],
+            prefixo=localidade[6],
+            prestadora=localidade[7],
+            numero_da_faixa_inicial=localidade[8],
+            numero_da_faixa_final=localidade[9],
+            latitude=localidade[10],
+            hemisferio=localidade[11],
+            longitude=localidade[12],
+            sigla_cnl_da_area_local=localidade[13],
+        )
+
+        if as_json:
+            # Se a opção estiver ativa, retornar como JSON
+            return json.dumps(localidade)
+
+        return localidade
+
+    def _pesquisar_localidade(self, prefixo, sufixo):
+        """Função auxiliar para pesquisar número no banco de dados."""
         try:
             c = self.conn.cursor()
             localidade = c.execute("""
-                SELECT * FROM open_cnl
-                WHERE prefixo = ?
-                AND CAST(numero_da_faixa_inicial as INTEGER) <= ?
-                AND CAST(numero_da_faixa_final as INTEGER) >= ?;
+                SELECT
+                    `sigla_uf`,
+                    `sigla_cnl`,
+                    `codigo_cnl`,
+                    `nome_da_localidade`,
+                    `nome_do_municipio`,
+                    `codigo_da_area_de_tarifacao`,
+                    `prefixo`,
+                    `prestadora`,
+                    `numero_da_faixa_inicial`,
+                    `numero_da_faixa_final`,
+                    `latitude`,
+                    `hemisferio`,
+                    `longitude`,
+                    `sigla_cnl_da_area_local`
+                FROM `open_cnl`
+                WHERE `prefixo` = ?
+                AND CAST(`numero_da_faixa_inicial` as INTEGER) <= ?
+                AND CAST(`numero_da_faixa_final` as INTEGER) >= ?;
             """, (prefixo, int(sufixo), int(sufixo))).fetchone()
         except Exception:
             raise ErroAoLerDoBancoDeDados
