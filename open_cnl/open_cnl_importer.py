@@ -36,6 +36,7 @@ class OpenCNLImporter(object):
         data['cmd'] = ''
         data = '&'.join(['='.join((key, data[key])) for key in data])
         requisicao = urllib2.Request(url, data=data)
+        requisicao.add_header('User-Agent', 'Anatel')
         resposta = urllib2.urlopen(requisicao)
         arquivo_zip = io.BytesIO(resposta.read())
         return arquivo_zip
