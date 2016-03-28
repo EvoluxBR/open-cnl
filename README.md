@@ -89,5 +89,5 @@ Victor Torres <vpaivatorres@gmail.com>
 
 ## Contribuidores
 
-Stefan Yohansson <sy.fen0@gmail.com>
-João Vitor Gomes <vitorjoaofg@gmail.com>
+- Stefan Yohansson <sy.fen0@gmail.com>
+- João Vitor Gomes <vitorjoaofg@gmail.com>
