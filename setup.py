@@ -13,4 +13,5 @@ setup(
     download_url = 'https://github.com/evoluxbr/open-cnl/tarball/0.7',
     keywords = ['anatel', 'cnl', 'base'],
     classifiers = [],
+    install_requires=['requests'],
 )

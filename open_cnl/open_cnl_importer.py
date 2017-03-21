@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import io
 import os
+import requests
 import sqlite3
 import sys
-import urllib2
 import zipfile
 
 
@@ -25,20 +25,9 @@ class OpenCNLImporter(object):
         formato ZIP, contendo a base (TXT) e um arquivo guia (DOC).
         """
         url = 'http://sistemas.anatel.gov.br/areaarea/N_Download/Tela.asp'
-        data = dict()
-        data['varTIPO'] = 'CentralCNL'
-        data['varMOD'] = 'Publico'
-        data['varCENTRAL'] = 'F'
-        data['varPRESTADORA'] = ''
-        data['varPERIODO'] = ''
-        data['varUF'] = ''
-        data['acao'] = 'c'
-        data['cmd'] = ''
-        data = '&'.join(['='.join((key, data[key])) for key in data])
-        requisicao = urllib2.Request(url, data=data)
-        requisicao.add_header('User-Agent', 'Anatel')
-        resposta = urllib2.urlopen(requisicao)
-        arquivo_zip = io.BytesIO(resposta.read())
+        form = {'varTIPO': 'CentralCNL', 'varCENTRAL': 'F', 'acao': 'c'}
+        resposta = requests.get(url, form, stream=True, verify=False)
+        arquivo_zip = io.BytesIO(resposta.content)
         return arquivo_zip
 
     def extrair_base_do_arquivo_zip(self, arquivo_zip):
